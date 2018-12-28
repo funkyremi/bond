@@ -125,7 +125,7 @@ class App extends Component {
                 <div className="record clickable" key={record.id} onClick={() => this.togglePlayback(record.id)}>
                   <span className="float-left record-info"><span>{this.formatTime(record.date)}</span></span>
                   <span className="float-right record-info"><span>{this.getDuration(record.recordStartTime, record.recordEndTime)}</span></span>
-                  <audio controls ref={record.id} id={record.id} src={record.url} />
+                  <audio ref={record.id} id={record.id} src={record.url} />
                 </div>
               );
             })}
