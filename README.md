@@ -4,11 +4,11 @@ This web project start recording audio when voice is detected and stop when ther
 
 ### Screenshot
 
-![screenshot](screenshot.png)
+![screenshot](public/screenshot.png)
 
 ### Live demo
 
-
+https://funkyremi.github.io/bond/
 
 ### Quick start
 
