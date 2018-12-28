@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import createAudioMeter from "./methods";
 import "./App.css";
 
-const VOLUME_LIMIT = 0.005;
+const VOLUME_LIMIT = 0.01;
 const INTERVAL_WITHOUT_SOUND = 3000;
 
 class App extends Component {
@@ -21,12 +21,15 @@ class App extends Component {
   }
   componentDidMount() {
     if (navigator.mediaDevices.getUserMedia) {
-      console.log("getUserMedia supported.");
       const onSuccess = stream => {
         const audioContext = new AudioContext();
         const mediaStreamSource = audioContext.createMediaStreamSource(stream);
         const meter = createAudioMeter(audioContext);
         mediaStreamSource.connect(meter);
+        this.mediaRecorder = new MediaRecorder(stream);
+        this.mediaRecorder.ondataavailable = e => {
+          this.chunks.push(e.data);
+        };
         let intervalWithoutSound = 0;
         setInterval(() => {
           if (this.state.recording) {
@@ -51,20 +54,13 @@ class App extends Component {
             this.record();
           }
         }, 100);
-
-        this.mediaRecorder = new MediaRecorder(stream);
-        this.mediaRecorder.ondataavailable = e => {
-          this.chunks.push(e.data);
-        };
       };
       const onError = err => {
-        console.log("The following error occured: " + err);
       };
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then(onSuccess, onError);
     } else {
-      console.log("Function not supported by the browser");
     }
   }
   record() {
@@ -74,21 +70,16 @@ class App extends Component {
     });
     this.chunks = [];
     this.mediaRecorder.start();
-    console.log(this.mediaRecorder.state);
-    console.log("recorder started");
   }
   stop() {
     this.mediaRecorder.stop();
-    const blob = new Blob(this.chunks, { type: "audio/ogg; codecs=opus" });
+    const blob = new Blob(this.chunks, { type: "audio/wav" });
     const records = this.state.records;
-    const recordStartTime = this.state.recordStartTime;
-    const recordEndTime = new Date();
-    const duration = recordEndTime.getTime() - recordStartTime.getTime();
-    console.log(duration);
+    const url = window.URL.createObjectURL(blob);
     records.unshift({
       id: uniqueId(),
       date: new Date(),
-      url: window.URL.createObjectURL(blob),
+      url,
       recordStartTime: this.state.recordStartTime,
       recordEndTime: new Date()
     });
@@ -106,7 +97,6 @@ class App extends Component {
   }
   togglePlayback(ref) {
     const element = this.refs[ref];
-    console.log(element)
     if (!element.paused) {
       element.pause();
     } else {
@@ -135,7 +125,7 @@ class App extends Component {
                 <div className="record clickable" key={record.id} onClick={() => this.togglePlayback(record.id)}>
                   <span className="float-left record-info"><span>{this.formatTime(record.date)}</span></span>
                   <span className="float-right record-info"><span>{this.getDuration(record.recordStartTime, record.recordEndTime)}</span></span>
-                  <audio ref={record.id} src={record.url} />
+                  <audio controls ref={record.id} id={record.id} src={record.url} />
                 </div>
               );
             })}
