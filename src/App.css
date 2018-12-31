@@ -10,8 +10,17 @@ body{
   color: rgb(60,60,60);
   font-weight: bold;
 }
-.record-info {
-  line-height: 0.2;
+.playback-button {
+  line-height: 25px;
+}
+.text-black {
+  color: rgb(60,60,60);
+}
+.text-black:hover {
+  color: rgb(60,60,60);
+}
+.margin-left-sm {
+  margin-left: 10px;
 }
 .clickable {
   cursor: pointer;
@@ -24,7 +33,7 @@ body {
 
 .record {
   width: 100%;
-  padding: 30px;
+  padding: 20px;
   margin-top: 10px;
   background-color:rgba(0, 255, 187, 0.8);
 }
